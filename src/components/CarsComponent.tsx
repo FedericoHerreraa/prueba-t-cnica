@@ -4,6 +4,8 @@ import { useVehicleStore } from "@/store/vehicleStore"
 import { useEffect } from "react"
 import { Car } from "./Car"
 
+import { ScrollArea } from "@/components/ui/scroll-area"
+
 
 export const CarsComponent = () => {
     const fetchVehicles = useVehicleStore(state => state.fetchVehicles)
@@ -34,11 +36,11 @@ export const CarsComponent = () => {
                 </section>
             </section>
 
-            <section className="flex flex-col gap-5">  
+            <ScrollArea className="flex flex-col gap-5 h-[100rem]">  
                 {vehicles.map((vehicle, index) => (
                     <Car key={index} vehicle={vehicle} />
                 ))}
-            </section>
+            </ScrollArea>
         </div>
     )
 }

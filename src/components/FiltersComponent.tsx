@@ -12,8 +12,32 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { useVehicleStore } from '../store/vehicleStore'
 
 
+
 export const FiltersComponent = () => {
     const { filters, setFilter } = useVehicleStore();
+    
+    const allCategories = accordions.find(acc => acc.title === 'Categoría del auto')?.items
+        .filter(item => item.title !== 'Todas las categorías')
+        .map(item => item.title) || [];
+    
+    const handleSelectAllCategories = (isChecked: boolean) => {
+        if (isChecked) {
+            allCategories.forEach(category => {
+                if (!filters.category.includes(category)) {
+                    setFilter('category', category);
+                }
+            });
+            if (!filters.category.includes('Todas las categorías')) {
+                setFilter('category', 'Todas las categorías');
+            }
+        } else {
+            [...allCategories, 'Todas las categorías'].forEach(category => {
+                if (filters.category.includes(category)) {
+                    setFilter('category', category);
+                }
+            });
+        }
+    };
     return (
         <div className="w-full h-full bg-white shadow-2xl rounded-3xl">
             <div className="w-[80%] mx-auto mt-5 flex items-center justify-between">
@@ -47,9 +71,15 @@ export const FiltersComponent = () => {
                                                                 ? filters.seats.includes(parseInt(item.title)) 
                                                                 : false
                                             }
-                                            onCheckedChange={() => {
+                                            onCheckedChange={(checked) => {
                                                 if (accordion.title === 'Compañia rentadora') setFilter('brand', item.title);
-                                                else if (accordion.title === 'Categoría del auto') setFilter('category', item.title);
+                                                else if (accordion.title === 'Categoría del auto') {
+                                                    if (item.title === 'Todas las categorías') {
+                                                        handleSelectAllCategories(checked === true);
+                                                    } else {
+                                                        setFilter('category', item.title);
+                                                    }
+                                                }
                                                 else if (accordion.title === 'Capacidad de maletas') setFilter('luggage', item.title.replace(' o mas maletas', ''));
                                                 else if (accordion.title === 'Cantidad de pasajeros') setFilter('seats', item.title.replace(' pasajeros', ''));
                                             }}
@@ -172,7 +202,7 @@ const accordions = [
                 amountOfResults: 3
             },
             {
-                title: 'SUV Standard Elite',
+                title: 'SUV Standard Elite',            
                 amountOfResults: 3
             },
             {
@@ -215,18 +245,18 @@ const accordions = [
         items: [
             {
                 title: '4 pasajeros',
-                amountOfResults: 12
+                amountOfResults: 3
             },
             {
                 title: '5 pasajeros',
-                amountOfResults: 78
+                amountOfResults: 3
             },
             {
                 title: '7 pasajeros',
-                amountOfResults: 16
+                amountOfResults: 3
             },
             {
-                title: '12 pasajeros',
+                title: '12 pasajeros',      
                 amountOfResults: 3
             },
             {
