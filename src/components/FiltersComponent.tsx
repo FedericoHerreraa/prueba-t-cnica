@@ -9,28 +9,51 @@ import {
 } from "@/components/ui/accordion"
 
 import { Checkbox } from "@/components/ui/checkbox"
+import { useVehicleStore } from '../store/vehicleStore'
 
 
 export const FiltersComponent = () => {
+    const { filters, setFilter } = useVehicleStore();
     return (
         <div className="w-full h-full bg-white shadow-2xl rounded-3xl">
-            <div className="w-[80%] mx-auto mt-5 flex items-center gap-5">
-                <img src={filterIcon} alt="filter-icon" className='w-6 h-6' />
-                <h1 className='font-semibold text-[#0071B1] text-lg'>Filtrar resultados</h1>
+            <div className="w-[80%] mx-auto mt-5 flex items-center justify-between">
+                <div className="flex items-center gap-5">
+                    <img src={filterIcon} alt="filter-icon" className='w-6 h-6' />
+                    <h1 className='font-semibold text-[#3179BD] text-lg'>Filtrar resultados</h1>
+                </div>
             </div>
             <div className="mt-7">
-                {accordions.map((accordion) => (
-                    <Accordion type="single" collapsible className="w-full mb-3">
-                        <AccordionItem value="item-1">
+                {accordions.map((accordion, index) => (
+                    <Accordion key={index} type="multiple" defaultValue={[`item-${index}`]} className="w-full mb-3">
+                        <AccordionItem value={`item-${index}`}>
                             <div className='bg-blue-500/5'>
                                 <div className='w-[80%] mx-auto'>
-                                    <AccordionTrigger className='font-semibold text-[#0071B1] cursor-pointer'>{accordion.title}</AccordionTrigger>
+                                    <AccordionTrigger className='font-semibold text-[#3179BD] cursor-pointer'>{accordion.title}</AccordionTrigger>
                                 </div>
                             </div>
                             <AccordionContent className='w-[80%] mx-auto mt-7'>
-                                {accordion.items.map((item) => (
-                                    <div className="flex items-center gap-5 mb-2">
-                                        <Checkbox className='border-zinc-400 cursor-pointer data-[state=checked]:border-[#0071B1] data-[state=checked]:bg-[#0071B1] data-[state=checked]:text-zinc-100' />
+                                {accordion.items.map((item, index) => (
+                                    <div key={index} className="flex items-center gap-5 mb-2">
+                                        <Checkbox 
+                                            className='border-zinc-400 cursor-pointer data-[state=checked]:border-[#3179BD] data-[state=checked]:bg-[#3179BD] data-[state=checked]:text-zinc-100'
+                                            checked={
+                                                accordion.title === 'Compañia rentadora' 
+                                                    ? filters.brand.includes(item.title) 
+                                                    : accordion.title === 'Categoría del auto' 
+                                                        ? filters.category.includes(item.title) 
+                                                        : accordion.title === 'Capacidad de maletas' 
+                                                            ? filters.luggage.includes(parseInt(item.title)) 
+                                                            : accordion.title === 'Cantidad de pasajeros' 
+                                                                ? filters.seats.includes(parseInt(item.title)) 
+                                                                : false
+                                            }
+                                            onCheckedChange={() => {
+                                                if (accordion.title === 'Compañia rentadora') setFilter('brand', item.title);
+                                                else if (accordion.title === 'Categoría del auto') setFilter('category', item.title);
+                                                else if (accordion.title === 'Capacidad de maletas') setFilter('luggage', item.title.replace(' o mas maletas', ''));
+                                                else if (accordion.title === 'Cantidad de pasajeros') setFilter('seats', item.title.replace(' pasajeros', ''));
+                                            }}
+                                        />
                                         <div className='flex items-center gap-2'>
                                             <p>{item.title}</p>
                                             <p className='text-sm text-zinc-400'>({item.amountOfResults})</p>
@@ -41,11 +64,11 @@ export const FiltersComponent = () => {
                         </AccordionItem>
                     </Accordion>
                 ))}
-                <Accordion type="single" collapsible className="w-full mb-5">
-                    <AccordionItem value="item-1">
+                <Accordion type="multiple" defaultValue={["price-range"]} className="w-full mb-5">
+                    <AccordionItem value="price-range">
                         <div className='bg-blue-500/5'>
                             <div className='w-[80%] mx-auto'>
-                                <AccordionTrigger className='font-semibold text-[#0071B1] cursor-pointer'>Fijar un rango de precio (COP)</AccordionTrigger>
+                                <AccordionTrigger className='font-semibold text-[#3179BD] cursor-pointer'>Fijar un rango de precio (COP)</AccordionTrigger>
                             </div>
                         </div>
                         <AccordionContent className='w-[80%] mx-auto mt-7'>
@@ -55,9 +78,9 @@ export const FiltersComponent = () => {
                                 <div className='w-1/5 bg-zinc-300/40 rounded-l-lg h-full flex justify-center items-center'>
                                     <p className='text-zinc-900/60 font-semibold'>COP</p>
                                 </div>
-                                <div className='w-4/5 rounded-r-lg flex justify-between items-center h-full px-5'>
+                                <div className='w-4/5 rounded-r-lg flex justify-between items-center h-full pr-5'>
                                     <p className='text-zinc-500 text-base'>desde</p>
-                                    <p className='text-[#0071B1] font-semibold text-base'>2,000,000.00</p>
+                                    <p className='text-[#3179BD] font-semibold text-base'>2,000,000.00</p>
                                 </div>
                             </div>
 
@@ -65,9 +88,9 @@ export const FiltersComponent = () => {
                                 <div className='w-1/5 bg-zinc-300/40 rounded-l-lg h-full flex justify-center items-center'>
                                     <p className='text-zinc-900/60 font-semibold'>COP</p>
                                 </div>
-                                <div className='w-4/5 rounded-r-lg flex justify-between items-center h-full px-5'>
+                                <div className='w-4/5 rounded-r-lg flex justify-between items-center h-full pr-5'>
                                     <p className='text-zinc-500 text-base'>hasta</p>
-                                    <p className='text-[#0071B1] font-semibold text-base'>7,000,000.00</p>
+                                    <p className='text-[#3179BD] font-semibold text-base'>7,000,000.00</p>
                                 </div>
                             </div>
                         </AccordionContent>
@@ -207,7 +230,7 @@ const accordions = [
                 amountOfResults: 3
             },
             {
-                title: '7/8 pasajeros',
+                title: '8 pasajeros',
                 amountOfResults: 3
             },
         ]
