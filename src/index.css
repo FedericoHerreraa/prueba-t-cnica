@@ -1,4 +1,3 @@
-/* GT Walsheim Font Faces */
 @font-face {
   font-family: 'GT Walsheim';
   src: url('./fonts/subset-GTWalsheim-Regular-_1.ttf') format('truetype');
@@ -23,7 +22,6 @@
   font-display: swap;
 }
 
-/* Aplicar GT Walsheim como font por defecto */
 body {
   font-family: 'GT Walsheim', sans-serif;
 }

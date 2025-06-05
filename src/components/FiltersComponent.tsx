@@ -251,15 +251,15 @@ const accordions = [
         items: [
             {
                 title: '4 pasajeros',
-                amountOfResults: 3
+                amountOfResults: 12
             },
             {
                 title: '5 pasajeros',
-                amountOfResults: 3
+                amountOfResults: 78
             },
             {
                 title: '7 pasajeros',
-                amountOfResults: 3
+                amountOfResults: 16
             },
             {
                 title: '12 pasajeros',      

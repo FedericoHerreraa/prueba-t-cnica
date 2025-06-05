@@ -1,8 +1,8 @@
-import { Checkbox } from "@/components/ui/checkbox"
 import { useVehicleStore } from "@/store/vehicleStore"
 import { useEffect } from "react"
 import { Car } from "./Car"
 
+import { Checkbox } from "@/components/ui/checkbox"
 import {
     Select,
     SelectContent,
@@ -10,8 +10,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import { ImSpinner } from "react-icons/im";
 
-// import { ScrollArea } from "@/components/ui/scroll-area"
 
 
 export const CarsComponent = () => {
@@ -24,7 +24,7 @@ export const CarsComponent = () => {
 
     useEffect(() => { fetchVehicles(100) }, [fetchVehicles])
 
-    if (vehicles.length === 0) return <div>Cargando...</div>
+    if (vehicles.length === 0) return <div className="w-full h-full flex items-center justify-center"><ImSpinner className="animate-spin text-2xl text-[#3179BD]" /></div>
 
     return (
         <div className="w-full h-full bg-zinc-100 rounded-md p-5">

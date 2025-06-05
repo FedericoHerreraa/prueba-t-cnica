@@ -39,7 +39,6 @@ import { useEffect, useState } from "react"
 import { useVehicleStore } from "@/store/vehicleStore";
 import { getBrandLogo, selectImage, kiaSoul } from "@/utils/reusable-functions";
 
-// Dinamic images selection
 
 export const Car = ({ vehicle }: { vehicle: CarType }) => {
     const [imageUrl, setImageUrl] = useState<string>(kiaSoul);

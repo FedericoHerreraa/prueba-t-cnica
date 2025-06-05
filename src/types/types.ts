@@ -1,4 +1,3 @@
-// Days calculation structure
 export interface Calculation {
   hours: number;
   minutes: number;
@@ -9,13 +8,11 @@ export interface DaysCalculation {
   calculation: Calculation;
 }
 
-// Picture URLs for car images
 export interface PictureUrl {
   normal: string;
   featured: string;
 }
 
-// Car features and specifications
 export interface Features {
   doors: string;
   seats: string;
@@ -31,7 +28,6 @@ export interface Features {
   category: string;
 }
 
-// Tags for car features and benefits
 export interface Tag {
   id: number;
   name_filter: string;
@@ -44,20 +40,17 @@ export interface Tag {
   priority: number;
 }
 
-// Inclusion services and features
 export interface Inclusion {
   name: string;
   description: string;
   visible_voucher: boolean;
 }
 
-// Payment details structure
 export interface PaymentDetails {
   prepaid_amount: string;
   paid_on_destination_amount: string;
 }
 
-// Base charge structure
 export interface ChargeBase {
   total_amount: string;
   estimated_total_amount: string;
@@ -66,25 +59,21 @@ export interface ChargeBase {
   pd: PaymentDetails;
 }
 
-// Total charge including discounts
 export interface TotalCharge {
   base: ChargeBase;
   discounts: unknown | null;
   total: ChargeBase;
 }
 
-// Currency pricing structure
 export interface CurrencyPricing {
   total_charge: TotalCharge;
 }
 
-// Pricing in different currencies
 export interface Pricing {
   USD: CurrencyPricing;
   COP: CurrencyPricing;
 }
 
-// Rate data structure
 export interface RateData {
   name: string;
   net_rate: boolean;
@@ -96,7 +85,6 @@ export interface RateData {
   step_one: boolean;
 }
 
-// Individual rate with all details
 export interface Rate {
   rate_data: RateData;
   inclusions_meta: Record<string, Inclusion>;
@@ -105,12 +93,10 @@ export interface Rate {
   tags: Tag[];
 }
 
-// All rates for a car
 export interface Rates {
   [rateCode: string]: Rate;
 }
 
-// Main car interface
 export interface Car {
   brand: number;
   name: string;
@@ -131,12 +117,10 @@ export interface Car {
   rates: Rates;
 }
 
-// Cars grouped by brand
 export interface CarsByBrand {
   [brandName: string]: Car[];
 }
 
-// Root structure of the JSON
 export interface CarsData {
   cars: CarsByBrand;
   days_calculation: DaysCalculation;

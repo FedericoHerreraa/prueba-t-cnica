@@ -36,7 +36,6 @@ export const useVehicleStore = create<VehicleStore>((set, get) => ({
     getSelectedVehicleForQuote: () => {
         const vehiclesSelected = get().vehiclesToQuote;
         if (vehiclesSelected.length === 0) return null;
-        // Si hay uno o más vehículos, siempre devolver el último (más reciente)
         return vehiclesSelected[vehiclesSelected.length - 1];
     },
 
