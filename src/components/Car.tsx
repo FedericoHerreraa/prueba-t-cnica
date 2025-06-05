@@ -5,7 +5,6 @@ import {
     TooltipContent,
     TooltipTrigger,
 } from "@/components/ui/tooltip"
-
 import {
     Carousel,
     CarouselContent,
@@ -15,9 +14,6 @@ import {
 } from "@/components/ui/carousel"
 
 // Icons
-import avisLogo from '../assets/icons_logos/avis-logo.svg'
-import budgetLogo from '../assets/icons_logos/budget-logo.svg'
-import paylessLogo from '../assets/icons_logos/payless-logo.svg'
 import starOutline from '../assets/icons_logos/star-outlined-icon.svg'
 import starSolid from '../assets/icons_logos/star-solid-icon.svg'
 import featuredIcon from '../assets/icons_logos/featured-icon.svg'
@@ -40,19 +36,15 @@ import { FeeDetail } from "./FeeDetail"
 import { type Car as CarType } from "@/types/types"
 import { useEffect, useState } from "react"
 
-const kiaSoul = '/cars/2021-kia-soul-s-5door-hatchback-black.png'
+import { useVehicleStore } from "@/store/vehicleStore";
+import { getBrandLogo, selectImage, kiaSoul } from "@/utils/reusable-functions";
 
-const selectImage = (img: string) => {
-    const fileName = img
-      .replace("https://test/assets/fleet_images/", "")
-      .replace(".png", "");
-  
-    return `/cars/${fileName}.png`;
-}
+// Dinamic images selection
 
 export const Car = ({ vehicle }: { vehicle: CarType }) => {
     const [imageUrl, setImageUrl] = useState<string>(kiaSoul);
     const [imageError, setImageError] = useState<boolean>(false);
+    const { addVehicleToQuote, vehiclesToQuote } = useVehicleStore();
 
     useEffect(() => {
         try {
@@ -73,7 +65,6 @@ export const Car = ({ vehicle }: { vehicle: CarType }) => {
 
     const validImage = imageError ? kiaSoul : imageUrl;
 
-    // Safety checks for vehicle properties
     if (!vehicle || !vehicle.features) {
         return <div className="rounded-3xl bg-white h-[271px] w-[968px] flex items-center justify-center">
             <p>Error: Vehicle data is missing</p>
@@ -84,9 +75,7 @@ export const Car = ({ vehicle }: { vehicle: CarType }) => {
         <div className="rounded-3xl bg-white h-[271px] w-[968px] overflow-hidden flex shadow-lg mb-5">
             <section className="w-[284px] h-full border-l-8 border-l-[#3179BD]">
                 <div className='pt-7 pl-7'>
-                    {vehicle.brand === 1 && <img src={avisLogo} alt="avis-logo" />}
-                    {vehicle.brand === 2 && <img src={budgetLogo} alt="budget-logo" />}
-                    {vehicle.brand === 3 && <img src={paylessLogo} alt="payless-logo" />}
+                    <img src={getBrandLogo(vehicle.brand)} alt="brand-logo" />
 
                     <div className='flex items-center gap-1 mt-2'>
                         {Array.from({ length: vehicle.stars }).map((_, index) => (
@@ -150,11 +139,17 @@ export const Car = ({ vehicle }: { vehicle: CarType }) => {
                     </div>
 
                     <div className='flex items-center mt-5 gap-2 h-1/3 text-xs font-semibold'>
-                        {/* <img src={checkLogo} alt="check-logo" className='w-3 h-3' />
-                        <p className='text-green-500'>Vehiculo agregado a su cotizacion (1 de 5)</p> */}
-
-                        <img src={vectorIcon} alt="vector-icon" className='w-3 h-3' />
-                        <p className='text-[#3179BD]'>Seleccionar este vehiculo para cotizar</p>
+                        {vehiclesToQuote.find(v => v.brand === vehicle.brand && v.code === vehicle.code) ? (
+                            <>
+                                <img src={checkLogo} alt="check-logo" className='w-3 h-3' />
+                                <p className='text-green-500'>Vehiculo agregado a su cotizacion {vehiclesToQuote.findIndex(v => v.brand === vehicle.brand && v.code === vehicle.code) + 1} de 5</p>
+                            </>
+                        ) : (
+                            <>
+                                <img src={vectorIcon} alt="vector-icon" className='w-3 h-3' />
+                                <p className='text-[#3179BD]'>Seleccionar este vehiculo para cotizar</p>
+                            </>
+                        )}
                     </div>
                 </div>
 
@@ -207,7 +202,10 @@ export const Car = ({ vehicle }: { vehicle: CarType }) => {
                                                 : 'N/A'
                                             })
                                         </p>
-                                        <button className='w-full rounded-lg bg-[#3179BD] text-white py-3 cursor-pointer mt-3'>
+                                        <button 
+                                            onClick={() => addVehicleToQuote(vehicle)}
+                                            className='w-full rounded-lg bg-[#3179BD] text-white py-3 cursor-pointer mt-3'
+                                        >
                                             Seleccionar
                                         </button>
                                     </div>

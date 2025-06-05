@@ -1,4 +1,3 @@
-
 import filterIcon from '../assets/icons_logos/filter-icon.svg'
 
 import {
@@ -7,19 +6,19 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from "@/components/ui/accordion"
+import { DualRangeSlider } from '@/components/ui/dual-range-slider';
 
 import { Checkbox } from "@/components/ui/checkbox"
 import { useVehicleStore } from '../store/vehicleStore'
 
 
-
 export const FiltersComponent = () => {
-    const { filters, setFilter } = useVehicleStore();
-    
+    const { filters, setFilter, setPriceRange } = useVehicleStore();
+
     const allCategories = accordions.find(acc => acc.title === 'Categoría del auto')?.items
         .filter(item => item.title !== 'Todas las categorías')
         .map(item => item.title) || [];
-    
+
     const handleSelectAllCategories = (isChecked: boolean) => {
         if (isChecked) {
             allCategories.forEach(category => {
@@ -38,6 +37,7 @@ export const FiltersComponent = () => {
             });
         }
     };
+
     return (
         <div className="w-full h-full bg-white shadow-2xl rounded-3xl">
             <div className="w-[80%] mx-auto mt-5 flex items-center justify-between">
@@ -62,13 +62,13 @@ export const FiltersComponent = () => {
                                             className='border-zinc-400 cursor-pointer data-[state=checked]:border-[#3179BD] data-[state=checked]:bg-[#3179BD] data-[state=checked]:text-zinc-100'
                                             checked={
                                                 accordion.title === 'Compañia rentadora' 
-                                                    ? filters.brand.includes(item.title) 
-                                                    : accordion.title === 'Categoría del auto' 
-                                                        ? filters.category.includes(item.title) 
-                                                        : accordion.title === 'Capacidad de maletas' 
-                                                            ? filters.luggage.includes(parseInt(item.title)) 
-                                                            : accordion.title === 'Cantidad de pasajeros' 
-                                                                ? filters.seats.includes(parseInt(item.title)) 
+                                                    ? filters.brand.includes(item.title)
+                                                    : accordion.title === 'Categoría del auto'
+                                                        ? filters.category.includes(item.title)
+                                                        : accordion.title === 'Capacidad de maletas'
+                                                            ? filters.luggage.includes(parseInt(item.title))
+                                                            : accordion.title === 'Cantidad de pasajeros'
+                                                                ? filters.seats.includes(parseInt(item.title))
                                                                 : false
                                             }
                                             onCheckedChange={(checked) => {
@@ -102,7 +102,13 @@ export const FiltersComponent = () => {
                             </div>
                         </div>
                         <AccordionContent className='w-[80%] mx-auto mt-7'>
-                            <p>Doble slider </p>
+                            <DualRangeSlider
+                                min={300000}
+                                max={2000000}
+                                step={50000}
+                                value={filters.priceRange}
+                                onValueChange={(val) => setPriceRange(val as [number, number])}
+                            />
 
                             <div className='flex items-center gap-2 rounded-lg h-10 border border-zinc-300/30 mt-5'>
                                 <div className='w-1/5 bg-zinc-300/40 rounded-l-lg h-full flex justify-center items-center'>
@@ -110,7 +116,7 @@ export const FiltersComponent = () => {
                                 </div>
                                 <div className='w-4/5 rounded-r-lg flex justify-between items-center h-full pr-5'>
                                     <p className='text-zinc-500 text-base'>desde</p>
-                                    <p className='text-[#3179BD] font-semibold text-base'>2,000,000.00</p>
+                                    <p className='text-[#3179BD] font-semibold text-base'>{filters.priceRange[0]?.toLocaleString()}</p>
                                 </div>
                             </div>
 
@@ -120,7 +126,7 @@ export const FiltersComponent = () => {
                                 </div>
                                 <div className='w-4/5 rounded-r-lg flex justify-between items-center h-full pr-5'>
                                     <p className='text-zinc-500 text-base'>hasta</p>
-                                    <p className='text-[#3179BD] font-semibold text-base'>7,000,000.00</p>
+                                    <p className='text-[#3179BD] font-semibold text-base'>{filters.priceRange[1]?.toLocaleString()}</p>
                                 </div>
                             </div>
                         </AccordionContent>
@@ -154,10 +160,6 @@ const accordions = [
         title: 'Categoría del auto',
         items: [
             {
-                title: 'Todas las categorías',
-                amountOfResults: 3
-            },
-            {
                 title: 'Económico',
                 amountOfResults: 3
             },
@@ -170,15 +172,19 @@ const accordions = [
                 amountOfResults: 3
             },
             {
-                title: 'Standard',
+                title: 'Estándar',
                 amountOfResults: 3
             },
             {
-                title: 'Full Size',
+                title: 'Grande',
                 amountOfResults: 3
             },
             {
-                title: 'SUV Intermedio',
+                title: 'SUV',
+                amountOfResults: 3
+            },
+            {
+                title: 'Van',
                 amountOfResults: 3
             },
             {
@@ -194,23 +200,23 @@ const accordions = [
                 amountOfResults: 3
             },
             {
-                title: 'SUV Premium',
-                amountOfResults: 3
-            },
-            {
-                title: 'Maxivan',
-                amountOfResults: 3
-            },
-            {
-                title: 'SUV Standard Elite',            
-                amountOfResults: 3
-            },
-            {
                 title: 'Minivan',
                 amountOfResults: 3
             },
             {
-                title: 'SUV Standard',
+                title: 'Eléctrico',
+                amountOfResults: 3
+            },
+            {
+                title: 'Híbrido',
+                amountOfResults: 3
+            },
+            {
+                title: 'Especial',
+                amountOfResults: 3
+            },
+            {
+                title: 'Standard Recreational Vehicle',
                 amountOfResults: 3
             },
         ]

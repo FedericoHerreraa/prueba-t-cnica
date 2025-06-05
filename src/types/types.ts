@@ -140,14 +140,24 @@ export interface CarsByBrand {
 export interface CarsData {
   cars: CarsByBrand;
   days_calculation: DaysCalculation;
-} 
+}
 
+export type PriceSort = 'none' | 'highest' | 'lowest'
 
 export type VehicleStore = {
   vehicles: Car[]
+  vehiclesToQuote: Car[]
+  showFeaturedFirst: boolean
+  priceSort: PriceSort
   filters: Filters
   fetchVehicles: (limit: number) => Promise<void>
   setFilter: (key: string, value: string) => void
+  setPriceRange: (range: [number, number]) => void
+  setShowFeaturedFirst: (show: boolean) => void
+  setPriceSort: (sort: PriceSort) => void
+  addVehicleToQuote: (vehicle: Car) => void
+  removeVehicleFromQuote: (vehicle: Car) => void
+  getSelectedVehicleForQuote: () => Car | null
 }
 
 

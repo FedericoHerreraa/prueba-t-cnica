@@ -1,17 +1,44 @@
 import { create } from "zustand"
-import { type VehicleStore } from "../types/types"
+import { type VehicleStore, type Car } from "../types/types"
 
 
 export const useVehicleStore = create<VehicleStore>((set, get) => ({
     vehicles: [],
+    vehiclesToQuote: [],
+    showFeaturedFirst: false,
+    priceSort: 'highest',
     filters: {
         brand: ['Avis', 'Budget', 'Payless'],
-        category: ['Todas las categorías', 'Económico', 'Compacto', 'Intermedio', 'Standard', 'Full Size', 'SUV Intermedio', 'Premium', 'Lujo', 'Convertible', 'SUV Premium', 'Maxivan', 'SUV Standard Elite', 'Minivan', 'SUV Standard'],
+        category: ['Económico', 'Compacto', 'Intermedio', 'Estándar', 'Grande', 'SUV', 'Van', 'Premium', 'Lujo', 'Convertible', 'Minivan', 'Eléctrico', 'Híbrido', 'Especial', 'Standard Recreational Vehicle'],
         luggage: [1, 2, 3, 4, 7],
         seats: [4, 5, 7, 12, 8],
-        priceRange: [0, 99999999],
+        priceRange: [300000, 2000000],
     },
 
+
+    addVehicleToQuote: (vehicle: Car) => {
+        const vehiclesSelected = get().vehiclesToQuote
+        if (vehiclesSelected.length < 5) {
+            set((state) => ({
+                vehiclesToQuote: [...state.vehiclesToQuote, vehicle]
+            }));
+        }
+    },
+
+    removeVehicleFromQuote: (vehicle: Car) => {
+        set((state) => ({
+            vehiclesToQuote: state.vehiclesToQuote.filter(v => 
+                !(v.brand === vehicle.brand && v.code === vehicle.code)
+            )
+        }));
+    },
+
+    getSelectedVehicleForQuote: () => {
+        const vehiclesSelected = get().vehiclesToQuote;
+        if (vehiclesSelected.length === 0) return null;
+        // Si hay uno o más vehículos, siempre devolver el último (más reciente)
+        return vehiclesSelected[vehiclesSelected.length - 1];
+    },
 
     setFilter: (key: string, value: string) => {
         set((state) => {
@@ -45,11 +72,28 @@ export const useVehicleStore = create<VehicleStore>((set, get) => ({
             return { filters: newFilters };
         });
         
-        // Re-fetch vehicles with new filters
         get().fetchVehicles(100);
     },
+
+    setPriceRange: (range: [number, number]) => {
+        set((state) => ({
+            filters: { ...state.filters, priceRange: range }
+        }));
+        get().fetchVehicles(100);
+    },
+
+    setShowFeaturedFirst: (show: boolean) => {
+        set({ showFeaturedFirst: show });
+        get().fetchVehicles(100);
+    },
+
+    setPriceSort: (sort: 'none' | 'highest' | 'lowest') => {
+        set({ priceSort: sort });
+        get().fetchVehicles(100);
+    },
+
     fetchVehicles: async (limit: number) => {
-        const { filters } = get();
+        const { filters, showFeaturedFirst, priceSort } = get();
 
         const response = await fetch('http://localhost:5173/carsJSON.json')
         const data = await response.json()
@@ -68,6 +112,17 @@ export const useVehicleStore = create<VehicleStore>((set, get) => ({
             return shuffled;
         };
 
+        const getVehiclePrice = (vehicle: Car): number => {
+            if (vehicle.rates && Object.keys(vehicle.rates).length > 0) {
+                const firstRateKey = Object.keys(vehicle.rates)[0];
+                const firstRate = vehicle.rates[firstRateKey];
+                if (firstRate.pricing?.COP?.total_charge?.total?.total_amount) {
+                    return parseFloat(firstRate.pricing.COP.total_charge.total.total_amount);
+                }
+            }
+            return 0;
+        };
+
         const filteredVehicles = allVehicles.filter((vehicle) => {
             const brandNames = ['', 'Avis', 'Budget', 'Payless'];
             const vehicleBrand = brandNames[vehicle.brand];
@@ -79,10 +134,59 @@ export const useVehicleStore = create<VehicleStore>((set, get) => ({
             
             const seatsMatch = filters.seats.length === 0 || filters.seats.includes(parseInt(vehicle.features.seats));
             
-            return brandMatch && categoryMatch && luggageMatch && seatsMatch;
+            let priceMatch = true;
+            if (vehicle.rates && Object.keys(vehicle.rates).length > 0) {
+                const vehiclePrice = getVehiclePrice(vehicle);
+                priceMatch = vehiclePrice >= filters.priceRange[0] && vehiclePrice <= filters.priceRange[1];
+            }
+            
+            return brandMatch && categoryMatch && luggageMatch && seatsMatch && priceMatch;
         });
 
-        const shuffledVehicles = shuffleArray(filteredVehicles);
-        set({ vehicles: shuffledVehicles.slice(0, limit) })
+        let finalVehicles = filteredVehicles;
+        
+        if (showFeaturedFirst && priceSort !== 'none') {
+            finalVehicles = filteredVehicles.sort((a, b) => {
+                const aFeatured = a.stars >= 4;
+                const bFeatured = b.stars >= 4;
+                
+                if (aFeatured && !bFeatured) return -1;
+                if (!aFeatured && bFeatured) return 1;
+                
+                const priceA = getVehiclePrice(a);
+                const priceB = getVehiclePrice(b);
+                
+                if (priceSort === 'highest') {
+                    return priceB - priceA;
+                } else {
+                    return priceA - priceB;
+                }
+            });
+        } else if (showFeaturedFirst) {
+            finalVehicles = filteredVehicles.sort((a, b) => {
+                const aFeatured = a.stars >= 4;
+                const bFeatured = b.stars >= 4;
+                
+                if (aFeatured && !bFeatured) return -1;
+                if (!aFeatured && bFeatured) return 1;
+                
+                return b.stars - a.stars;
+            });
+        } else if (priceSort !== 'none') {
+            finalVehicles = filteredVehicles.sort((a, b) => {
+                const priceA = getVehiclePrice(a);
+                const priceB = getVehiclePrice(b);
+                
+                if (priceSort === 'highest') {
+                    return priceB - priceA;
+                } else {
+                    return priceA - priceB;
+                }
+            });
+        } else {
+            finalVehicles = shuffleArray(filteredVehicles);
+        }
+
+        set({ vehicles: finalVehicles.slice(0, limit) })
     }
 }))
